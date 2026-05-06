@@ -1,3 +1,16 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+    "rewrites": [
+          {
+                  "source": "/auth/:path*",
+                  "destination": "https://todo-app-production-e9af.up.railway.app/auth/:path*"
+          },
+          {
+                  "source": "/api/:path*",
+                  "destination": "https://todo-app-production-e9af.up.railway.app/api/:path*"
+          },
+          {
+                  "source": "/(.*)",
+                  "destination": "/"
+          }
+    ]
 }
