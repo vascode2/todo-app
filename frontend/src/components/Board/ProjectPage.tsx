@@ -30,59 +30,46 @@ export default function ProjectPage() {
   if (!project) return <div className="flex-1 flex items-center justify-center text-gray-400">Project not found</div>;
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex-1 flex flex-col overflow-hidden min-w-0">
       {/* Toolbar */}
-      <div className="px-6 py-4 border-b border-gray-200 bg-white flex items-center gap-4">
-        <div className="flex items-center gap-2 flex-1">
+      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-white flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
           <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: project.color }} />
-          <h1 className="text-lg font-bold text-gray-900">{project.name}</h1>
-          {project.description && <span className="text-sm text-gray-400">{project.description}</span>}
+          <h1 className="text-base sm:text-lg font-bold text-gray-900 truncate">{project.name}</h1>
+          {project.description && <span className="hidden sm:inline text-sm text-gray-400 truncate">{project.description}</span>}
         </div>
-
         {/* Search */}
-        <div className="relative">
+        <div className="relative order-3 sm:order-none w-full sm:w-auto">
           <svg className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search tasks…"
-            className="text-sm pl-9 pr-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 w-48" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search tasks…" className="text-sm pl-9 pr-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 w-full sm:w-48" />
         </div>
-
         {/* View toggle */}
         <div className="flex bg-gray-100 rounded-lg p-0.5">
-          <button onClick={() => setView('board')}
-            className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md transition-colors ${view === 'board' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}>
+          <button onClick={() => setView('board')} className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md transition-colors ${view === 'board' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
             </svg>
-            Board
+            <span className="hidden sm:inline">Board</span>
           </button>
-          <button onClick={() => setView('list')}
-            className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md transition-colors ${view === 'list' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}>
+          <button onClick={() => setView('list')} className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md transition-colors ${view === 'list' ? 'bg-white shadow text-gray-800' : 'text-gray-500 hover:text-gray-700'}`}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
             </svg>
-            List
+            <span className="hidden sm:inline">List</span>
           </button>
         </div>
       </div>
-
       {/* Content */}
-      <div className="flex-1 overflow-hidden p-6">
+      <div className="flex-1 overflow-hidden p-3 sm:p-6">
         {view === 'board'
           ? <KanbanBoard project={project} onTaskClick={setSelectedTask} search={search} />
           : <ListView project={project} onTaskClick={setSelectedTask} search={search} />
         }
       </div>
-
       {selectedTask && (
-        <TaskModal
-          taskId={selectedTask.id}
-          projectId={project.id}
-          labels={project.labels}
-          onClose={() => setSelectedTask(null)}
-        />
+        <TaskModal taskId={selectedTask.id} projectId={project.id} labels={project.labels} onClose={() => setSelectedTask(null)} />
       )}
     </div>
   );
