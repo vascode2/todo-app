@@ -109,7 +109,7 @@ export default function KanbanBoard({ project, onTaskClick, search }: Props) {
             onDeleteList={id => deleteList.mutate(id)} />
         ))}
 
-        <div className="w-72 shrink-0">
+        <div className="w-[80vw] max-w-72 sm:w-72 shrink-0">
           {addingList ? (
             <form onSubmit={e => { e.preventDefault(); if (listName.trim()) addList.mutate(listName.trim()); }}
               className="bg-gray-100 rounded-xl p-3">
