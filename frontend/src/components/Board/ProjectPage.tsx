@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { projectsApi } from '../../api/client';
 import { Project, Task } from '../../types';
 import KanbanBoard from './KanbanBoard';
@@ -11,6 +11,8 @@ type View = 'board' | 'list';
 
 export default function ProjectPage() {
   const { projectId } = useParams<{ projectId: string }>();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
   const [view, setView] = useState<View>('board');
   const [search, setSearch] = useState('');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -20,6 +22,21 @@ export default function ProjectPage() {
     queryFn: () => projectsApi.get(projectId!),
     enabled: !!projectId,
   });
+
+  const deleteProject = useMutation({
+    mutationFn: () => projectsApi.delete(projectId!),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['projects'] });
+      navigate('/');
+    },
+  });
+
+  const handleDelete = () => {
+    if (!project) return;
+    if (confirm(`Delete project "${project.name}"? This will permanently remove all its lists and tasks.`)) {
+      deleteProject.mutate();
+    }
+  };
 
   if (isLoading) return (
     <div className="flex-1 flex items-center justify-center">
@@ -60,6 +77,12 @@ export default function ProjectPage() {
             <span className="hidden sm:inline">List</span>
           </button>
         </div>
+        {/* Delete project */}
+        <button onClick={handleDelete} title="Delete project" aria-label="Delete project" className="text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
       </div>
       {/* Content */}
       <div className="flex-1 overflow-hidden p-3 sm:p-6">
