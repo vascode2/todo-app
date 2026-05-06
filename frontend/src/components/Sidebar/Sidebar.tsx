@@ -5,7 +5,11 @@ import { projectsApi } from '../../api/client';
 import { Project } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 
-export default function Sidebar() {
+interface Props {
+  onNavigate?: () => void;
+}
+
+export default function Sidebar({ onNavigate }: Props) {
   const { projectId } = useParams();
   const { user, logout } = useAuth();
   const qc = useQueryClient();
@@ -19,28 +23,35 @@ export default function Sidebar() {
 
   const createProject = useMutation({
     mutationFn: (name: string) => projectsApi.create({ name }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['projects'] }); setNewName(''); setCreating(false); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['projects'] });
+      setNewName('');
+      setCreating(false);
+    },
   });
 
-  const colors = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#ef4444'];
-
   return (
-    <aside className="w-64 bg-gray-900 text-white flex flex-col h-full shrink-0">
-      <div className="p-4 border-b border-gray-700">
+    <aside className="w-64 bg-gray-900 text-white flex flex-col h-screen md:h-full shrink-0">
+      <div className="p-4 border-b border-gray-700 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center text-sm font-bold">TF</div>
           <span className="font-semibold text-lg">TaskFlow</span>
         </div>
+        {onNavigate && (
+          <button onClick={onNavigate} aria-label="Close menu" className="md:hidden text-gray-400 hover:text-white p-1">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
       </div>
-
       <nav className="flex-1 p-3 overflow-y-auto">
-        <Link to="/" className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm mb-1">
+        <Link to="/" onClick={onNavigate} className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm mb-1">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
           All Tasks
         </Link>
-
         <div className="mt-4">
           <div className="flex items-center justify-between px-3 mb-1">
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Projects</span>
@@ -50,26 +61,19 @@ export default function Sidebar() {
               </svg>
             </button>
           </div>
-
           {creating && (
-            <form onSubmit={e => { e.preventDefault(); if (newName.trim()) createProject.mutate(newName.trim()); }}
-              className="px-3 mb-2">
-              <input autoFocus value={newName} onChange={e => setNewName(e.target.value)}
-                onBlur={() => { if (!newName.trim()) setCreating(false); }}
-                placeholder="Project name" className="w-full bg-gray-800 text-white text-sm rounded px-2 py-1 outline-none border border-gray-600 focus:border-primary-500" />
+            <form onSubmit={e => { e.preventDefault(); if (newName.trim()) createProject.mutate(newName.trim()); }} className="px-3 mb-2">
+              <input autoFocus value={newName} onChange={e => setNewName(e.target.value)} onBlur={() => { if (!newName.trim()) setCreating(false); }} placeholder="Project name" className="w-full bg-gray-800 text-white text-sm rounded px-2 py-1 outline-none border border-gray-600 focus:border-primary-500" />
             </form>
           )}
-
           {projects.map(p => (
-            <Link key={p.id} to={`/project/${p.id}`}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${projectId === p.id ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}>
+            <Link key={p.id} to={`/project/${p.id}`} onClick={onNavigate} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${projectId === p.id ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}>
               <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
               <span className="truncate">{p.name}</span>
             </Link>
           ))}
         </div>
       </nav>
-
       <div className="p-3 border-t border-gray-700">
         <div className="flex items-center gap-2 px-2 py-1.5">
           {user?.avatar
