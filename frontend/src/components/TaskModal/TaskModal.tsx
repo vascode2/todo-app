@@ -55,12 +55,12 @@ export default function TaskModal({ taskId, projectId, labels, onClose }: Props)
   const totalSubtasks = task.subtasks?.length ?? 0;
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
+    <div className="fixed inset-0 bg-black/40 flex items-end sm:items-center justify-center z-50 sm:p-4" onClick={onClose}>
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-2xl h-[95vh] sm:h-auto sm:max-h-[90vh] flex flex-col overflow-hidden"
         onClick={e => e.stopPropagation()}>
 
         {/* Header */}
-        <div className="flex items-start justify-between p-6 pb-4 border-b border-gray-100">
+        <div className="flex items-start justify-between p-4 sm:p-6 sm:pb-4 border-b border-gray-100">
           <div className="flex-1 mr-4">
             {editingTitle ? (
               <input autoFocus value={titleVal} onChange={e => setTitleVal(e.target.value)}
@@ -88,7 +88,7 @@ export default function TaskModal({ taskId, projectId, labels, onClose }: Props)
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
           {/* Meta row */}
           <div className="flex flex-wrap gap-4">
             {/* Priority */}
